@@ -8,7 +8,6 @@ service InventoryService {
 message Empty{}
 
 message ProductResponse {
-    repeated ProductResponse products = 1;
     int32 id = 1;
     string name = 2;
     int32 quantity = 3;
