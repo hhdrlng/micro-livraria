@@ -52,39 +52,69 @@ function calculateShipping(id, cep) {
         });
 }
 
-document.addEventListener('DOMContentLoaded', function () {
+//
+
+function renderBooks(lista) {
     const books = document.querySelector('.books');
+    books.innerHTML = "";
 
-    fetch('http://localhost:3000/products')
-        .then((data) => {
-            if (data.ok) {
-                return data.json();
-            }
-            throw data.statusText;
-        })
-        .then((data) => {
-            if (data) {
-                data.forEach((book) => {
-                    books.appendChild(newBook(book));
-                });
+    lista.forEach((book) => {
+        books.appendChild(newBook(book));
+    });
 
-                document.querySelectorAll('.button-shipping').forEach((btn) => {
-                    btn.addEventListener('click', (e) => {
-                        const id = e.target.getAttribute('data-id');
-                        const cep = document.querySelector(`.book[data-id="${id}"] input`).value;
-                        calculateShipping(id, cep);
-                    });
-                });
-
-                document.querySelectorAll('.button-buy').forEach((btn) => {
-                    btn.addEventListener('click', (e) => {
-                        swal('Compra de livro', 'Sua compra foi realizada com sucesso', 'success');
-                    });
-                });
-            }
-        })
-        .catch((err) => {
-            swal('Erro', 'Erro ao listar os produtos', 'error');
-            console.error(err);
+    document.querySelectorAll('.button-shipping').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+            const id = e.target.getAttribute('data-id');
+            const cep = document.querySelector(`.book[data-id="${id}"] input`).value;
+            calculateShipping(id, cep);
         });
+    });
+
+    document.querySelectorAll('.button-buy').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            swal('Compra de livro', 'Sua compra foi realizada com sucesso', 'success');
+        });
+    });
+}
+
+//
+
+function buscarPorId() {
+    const id = document.getElementById("idInput").value;
+
+    if (!id) return;
+
+    fetch(`http://localhost:3000/product/${id}`)
+        .then((res) => {
+            if (res.ok) return res.json();
+            throw res.statusText;
+        })
+        .then((book) => {
+            if (!book || !book.id) {
+                document.querySelector('.books').innerHTML = "<p>Livro não encontrado</p>";
+                return;
+            }
+
+            renderBooks([book]);
+        })
+        .catch(() => {
+            document.querySelector('.books').innerHTML = "<p>Erro ao buscar livro</p>";
+        });
+}
+
+//
+
+function carregarProdutos() {
+    fetch('http://localhost:3000/products')
+        .then((res) => res.json())
+        .then((data) => renderBooks(data))
+        .catch(() => {
+            document.querySelector('.books').innerHTML = "<p>Erro ao carregar</p>";
+        });
+}
+
+//
+
+document.addEventListener('DOMContentLoaded', function () {
+    carregarProdutos();
 });
