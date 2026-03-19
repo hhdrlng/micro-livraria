@@ -82,7 +82,10 @@ function renderBooks(lista) {
 function buscarPorId() {
     const id = document.getElementById("idInput").value;
 
-    if (!id) return;
+    if (!id) {
+        carregarProdutos();
+        return;
+    }
 
     fetch(`http://localhost:3000/product/${id}`)
         .then((res) => {
@@ -111,6 +114,20 @@ function carregarProdutos() {
         .catch(() => {
             document.querySelector('.books').innerHTML = "<p>Erro ao carregar</p>";
         });
+}
+
+//
+
+function handleEnter(event) {
+    if (event.key === "Enter") {
+        const id = document.getElementById("idInput").value;
+
+        if (!id) {
+            carregarProdutos();
+        } else {
+            buscarPorId();
+        }
+    }
 }
 
 //
